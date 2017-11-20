@@ -97,16 +97,17 @@ class RasaCoreServer(object):
     @app.route("/conversations/<cid>/continue", methods=['POST', 'OPTIONS'])
     @check_cors
     def continue_predicting(self, request, cid):
-        request.setHeader('Content-Type', 'application/json')
-        request_params = json.loads(
-                request.content.read().decode('utf-8', 'strict'))
-        encoded_events = request_params.get("events", [])
-        executed_action = request_params.get("executed_action", None)
-        events = convert_obj_2_tracker_events(encoded_events, self.agent.domain)
-        response = self.agent.continue_message_handling(cid,
-                                                        executed_action,
-                                                        events)
-        return json.dumps(response)
+        if request.method.decode('utf-8', 'strict') == 'POST':
+            request.setHeader('Content-Type', 'application/json')
+            request_params = json.loads(
+                    request.content.read().decode('utf-8', 'strict'))
+            encoded_events = request_params.get("events", [])
+            executed_action = request_params.get("executed_action", None)
+            events = convert_obj_2_tracker_events(encoded_events, self.agent.domain)
+            response = self.agent.continue_message_handling(cid,
+                                                            executed_action,
+                                                            events)
+            return json.dumps(response)
 
     @app.route("/conversations/<cid>/parse", methods=['GET', 'POST', 'OPTIONS'])
     @check_cors
